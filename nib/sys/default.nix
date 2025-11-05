@@ -1,27 +1,50 @@
-{...}: rec {
+{lib, ...}: let
+  # XXX: TODO: Move these helper functions into their own modules
+  listToTrivialAttrs = values:
+    builtins.listToAttrs (builtins.map (x: {
+        name = x;
+        value = x;
+      })
+      values);
+
+  attrVals = lib.attrsets.attrVals;
+in rec {
+  toSystemName = arch: platform: "${arch}-${platform}";
+  listsToSystemNames = archs: platforms:
+    lib.lists.crossLists (arch: platform: toSystemName arch platform)
+    [
+      (attrVals archs)
+      (attrVals platforms)
+    ];
+
   # REF: https://github.com/nix-systems/nix-systems
-  archs = {
-    x86_64 = "x86_64";
-    aarch64 = "aarch64";
-    riscv64 = "riscv64";
-  };
+  archs = listToTrivialAttrs arch;
+  arch = [
+    "x86_64"
+    "aarch64"
+    "riscv64"
+  ];
 
-  osnames = {
-    linux = "linux";
-    darwin = "darwin";
-  };
+  # REF: https://github.com/nix-systems/nix-systems
+  platforms = listToTrivialAttrs platform;
+  platform = [
+    "linux"
+    "darwin"
+  ];
 
-  systemName = arch: osname: "${arch}-${osname}";
+  # Nix System Identifier Lists - Default Supported Systems
+  systems = systemsDefault;
+  systemsDefault = systemsX86_64 // systemsAArch64;
 
-  systems = let
-    mkSystem = arch: osname: let x = systemName arch osname; in {x = x;};
-  in
-    with archs;
-    with osnames; {
-      inherit (mkSystem x86_64 linux);
-      inherit (mkSystem x86_64 darwin);
-      inherit (mkSystem aarch64 linux);
-      inherit (mkSystem aarch64 darwin);
-      inherit (mkSystem riscv64 linux);
-    };
+  # Nix System Identifier Lists - All Potential Systems
+  systemsAll = listsToSystemNames archs platforms;
+
+  # Nix System Identifier Lists - Platform Specific
+  systemsLinux = listsToSystemNames archs [platform.linux];
+  systemsDarwin = listsToSystemNames archs [platform.darwin];
+
+  # Nix System Identifier Lists - Architecture Specific
+  systemsX86_64 = listsToSystemNames [arch.x86_64] platforms;
+  systemsAArch64 = listsToSystemNames [arch.aarch64] platforms;
+  systemsRiscV64 = listsToSystemNames [arch.riscv64] platforms;
 }
