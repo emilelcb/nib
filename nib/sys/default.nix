@@ -9,14 +9,6 @@
 
   attrVals = lib.attrsets.attrVals;
 in rec {
-  toSystemName = arch: platform: "${arch}-${platform}";
-  listsToSystemNames = archs: platforms:
-    lib.lists.crossLists (arch: platform: toSystemName arch platform)
-    [
-      (attrVals archs)
-      (attrVals platforms)
-    ];
-
   # REF: https://github.com/nix-systems/nix-systems
   archs = listToTrivialAttrs arch;
   arch = [
@@ -47,4 +39,16 @@ in rec {
   systemsX86_64 = listsToSystemNames [arch.x86_64] platforms;
   systemsAArch64 = listsToSystemNames [arch.aarch64] platforms;
   systemsRiscV64 = listsToSystemNames [arch.riscv64] platforms;
+
+  # === Internal Helper Functions ===
+  toSystemName = arch: platform: "${arch}-${platform}";
+  listsToSystemNames = archs: platforms:
+    lib.lists.crossLists (arch: platform: toSystemName arch platform)
+    [
+      (attrVals archs)
+      (attrVals platforms)
+    ];
+
+  # === External Functions ===
+  # TODO
 }
