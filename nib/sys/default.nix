@@ -6,8 +6,6 @@
         value = x;
       })
       values);
-
-  attrVals = lib.attrsets.attrVals;
 in rec {
   # REF: https://github.com/nix-systems/nix-systems
   archs = listToTrivialAttrs arch;
@@ -44,10 +42,10 @@ in rec {
   toSystemName = arch: platform: "${arch}-${platform}";
   listsToSystemNames = archs: platforms:
     lib.lists.crossLists (arch: platform: toSystemName arch platform)
-    [
-      (attrVals archs)
-      (attrVals platforms)
-    ];
+    (with lib.attrsets; [
+      (attrValues archs)
+      (attrValues platforms)
+    ]);
 
   # === External Functions ===
   # TODO
