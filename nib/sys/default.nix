@@ -8,35 +8,33 @@
       values);
 in rec {
   # REF: https://github.com/nix-systems/nix-systems
-  archs = listToTrivialAttrs arch;
-  arch = [
+  archs = listToTrivialAttrs [
     "x86_64"
     "aarch64"
     "riscv64"
   ];
 
   # REF: https://github.com/nix-systems/nix-systems
-  platforms = listToTrivialAttrs platform;
-  platform = [
+  platforms = listToTrivialAttrs [
     "linux"
     "darwin"
   ];
 
   # Nix System Identifier Lists - Default Supported Systems
-  systems = systemsDefault;
-  systemsDefault = systemsX86_64 // systemsAArch64;
+  # systems = systemsDefault;
+  systems.default = systems.x86_64 // systems.aarch64;
 
   # Nix System Identifier Lists - All Potential Systems
-  systemsAll = listsToSystemNames archs platforms;
+  systems.all = listsToSystemNames archs platforms;
 
   # Nix System Identifier Lists - Platform Specific
-  systemsLinux = listsToSystemNames archs [platform.linux];
-  systemsDarwin = listsToSystemNames archs [platform.darwin];
+  systems.linux = listsToSystemNames archs [platforms.linux];
+  systems.darwin = listsToSystemNames archs [platforms.darwin];
 
   # Nix System Identifier Lists - Architecture Specific
-  systemsX86_64 = listsToSystemNames [arch.x86_64] platforms;
-  systemsAArch64 = listsToSystemNames [arch.aarch64] platforms;
-  systemsRiscV64 = listsToSystemNames [arch.riscv64] platforms;
+  systems.x86_64 = listsToSystemNames [archs.x86_64] platforms;
+  systems.aarch64 = listsToSystemNames [archs.aarch64] platforms;
+  systems.riscv64 = listsToSystemNames [archs.riscv64] platforms;
 
   # === Internal Helper Functions ===
   toSystemName = arch: platform: "${arch}-${platform}";
