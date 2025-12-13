@@ -1,4 +1,7 @@
-{lists}: let
+{
+  attrs,
+  lists,
+}: let
   # === Internal Helper Functions ===
   toSystemName = arch: platform: "${arch}-${platform}";
   listsToSystemNames = archs: platforms:
@@ -9,14 +12,14 @@
     ];
 in rec {
   # REF: https://github.com/nix-systems/nix-systems
-  archs = lists.listToAttrsIdentity [
+  archs = attrs.identityAttrsList [
     "x86_64"
     "aarch64"
     "riscv64"
   ];
 
   # REF: https://github.com/nix-systems/nix-systems
-  platforms = lists.listToAttrsIdentity [
+  platforms = attrs.identityAttrsList [
     "linux"
     "darwin"
   ];

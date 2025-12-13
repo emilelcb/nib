@@ -1,12 +1,9 @@
 {lists}: rec {
   nameValuePair = name: value: {inherit name value;};
 
-  listToAttrsIdentity = values:
-    builtins.listToAttrs (
-      builtins.map
-      (x: nameValuePair x x)
-      values
-    );
+  identityAttrs = value: {${value} = value;};
+
+  identityAttrsList = values: builtins.map (v: identityAttrs v) values;
 
   /**
   Generate an attribute set by mapping a function over a list of
