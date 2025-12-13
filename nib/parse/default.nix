@@ -4,7 +4,7 @@
 }: let
   struct = import ./struct.nix {inherit attrs result;};
 in
-  builtins.listToAttrs [
+  attrs.mergeAttrsList [
     # submodule is included directly to this module (ie self.myFunc)
     struct
 
