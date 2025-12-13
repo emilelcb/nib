@@ -5,7 +5,7 @@
     result = std.result;
   };
 in
-  builtins.listToAttrs [
+  std.attrs.mergeAttrsList [
     # submodule content is accessible first by submodule name
     # then by the name of the content (ie self.submodule.myFunc)
     {inherit parse;}
