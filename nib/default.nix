@@ -28,7 +28,7 @@ in
       in {
         inherit pkgsFor;
         forAllSystems = f:
-          std.genAttrs systems (
+          std.attrs.genAttrs systems (
             system: f system (pkgsFor system)
           );
       };
@@ -40,7 +40,7 @@ in
       in {
         inherit pkgsFor upkgsFor;
         forAllSystems = f:
-          std.genAttrs systems (
+          std.attrs.genAttrs systems (
             system: f system (pkgsFor system) (upkgsFor system)
           );
       };
