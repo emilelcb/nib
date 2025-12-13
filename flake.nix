@@ -1,12 +1,8 @@
 {
   description = "MyNib - My Nix Library";
 
-  inputs.systems = "github:nix-systems/default";
+  inputs.systems.url = "github:nix-systems/default";
 
-  outputs = {
-    self,
-    systems,
-    ...
-  } @ inputs:
+  outputs = {systems}:
     import ./nib {inherit systems;};
 }
