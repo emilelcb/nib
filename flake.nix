@@ -3,10 +3,8 @@
 
   inputs.systems.url = "github:nix-systems/default";
 
-  outputs = {
-    self,
-    systems,
-    ...
-  }:
+  outputs = {self, ...} @ inputs: let
+    systems = import inputs.systems;
+  in
     import ./nib {inherit systems;};
 }
