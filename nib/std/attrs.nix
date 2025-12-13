@@ -1,4 +1,4 @@
-rec {
+{lists}: rec {
   nameValuePair = name: value: {inherit name value;};
 
   listToAttrsIdentity = values:
@@ -77,4 +77,25 @@ rec {
   :::
   */
   genAttrs' = xs: f: builtins.listToAttrs (map f xs);
+
+  mapAttrsRecursiveCond = cond: f: set: let
+    recurse = path:
+      builtins.mapAttrs (
+        name: value:
+          if builtins.isAttrs value && cond value
+          then recurse (path ++ [name]) value
+          else f (path ++ [name]) value
+      );
+  in
+    recurse [] set;
+
+  mapAttrsRecursive = f: set: mapAttrsRecursiveCond (as: true) f set;
+
+  # form: attrValueAt :: xs -> path -> value
+  # given path as a list of strings, return that value of an
+  # attribute set at that path
+  attrValueAt = lists.foldl (l: r:
+    if l != null && builtins.hasAttr r l
+    then l.${r}
+    else null);
 }
