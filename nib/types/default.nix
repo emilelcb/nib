@@ -2,6 +2,7 @@
   attrs = import ./attrs.nix args;
   fault = import ./fault.nix args;
   lists = import ./lists.nix args;
+  maybe = import ./maybe.nix args;
   res = import ./res.nix args;
 in
   attrs.mergeAttrsList [
@@ -9,6 +10,7 @@ in
     attrs
     fault
     lists
+    maybe
     res
 
     # submodule content is accessible first by submodule name
