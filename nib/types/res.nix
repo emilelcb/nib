@@ -2,28 +2,30 @@
 with builtins;
 with nib.types; rec {
   # Res (Result) Monad
-  Res = success: value: {inherit success value;};
+  Res = success: value: {
+    _success_ = success;
+    _value_ = value;
+  };
   Ok = value: Res true value;
   Ok' = Ok "ok";
   Err = value: Res false value;
   Err' = Err "err";
 
   # Pattern Matching
-  isRes = R: attrNames R == ["success" "value"];
-  isOk = R: isRes R && R.success;
-  isErr = R: isRes R && !R.success;
+  isRes = R: attrNames R == ["_success_" "_value_"];
+  isOk = R: isRes R && R._success_;
+  isErr = R: isRes R && !R._success_;
 
   # Unwrap (Monadic Return Operation)
-  unwrapRes = f: R:
-    if isErr R
-    then f R.value
-    else R.value;
+  unwrapRes = f: g: R:
+    if isOk R
+    then f R._value_
+    else g R._value_;
+  unwrapOk = f: unwrapRes f (R: R._value_);
+  unwrapErr = f: unwrapRes (R: R._value_) f;
 
   # Map (Monadic Bind Operation)
-  mapRes = f: g: R:
-    if isOk R
-    then Ok (f R.value)
-    else Err (g R.value);
+  mapRes = f: g: unwrapRes (R: Ok (f R)) (R: Err (f R));
   mapOk = f: mapRes f (x: x);
   mapErr = f: mapRes (x: x) f;
 
@@ -38,5 +40,6 @@ with nib.types; rec {
     then R
     else f R;
 
+  # Standard Helpers
   firstErr = findFirst isErr Ok';
 }
