@@ -1,4 +1,4 @@
-{}: let
+{...}: let
   attrs = import ./attrs.nix {inherit lists;};
   lists = import ./lists.nix {};
   result = import ./lists.nix {inherit lists;};

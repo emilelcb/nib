@@ -1,4 +1,4 @@
-{lists}: rec {
+{lists, ...}: rec {
   nameValuePair = name: value: {inherit name value;};
 
   identityAttrs = value: {${value} = value;};
