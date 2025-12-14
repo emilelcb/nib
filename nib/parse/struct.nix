@@ -1,5 +1,6 @@
 {nib, ...}:
-with builtins nib.types; rec {
+with builtins;
+with nib.types; rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
     if isAttrs S && isAttrs T
     then let
