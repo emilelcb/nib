@@ -95,10 +95,13 @@ with nib.types; rec {
   # form: attrValueAt :: xs -> path -> value
   # given path as a list of strings, return that value of an
   # attribute set at that path
-  attrValueAt = foldl (l: r:
-    if l != null && hasAttr r l
-    then l.${r}
-    else null);
+  attrValueAt = let
+    value = foldl (l: r:
+      if isAttrs l && hasAttr r l
+      then l.${r}
+      else null);
+  in
+    nullableToMaybe value;
 
   mergeAttrsList = list: let
     # `binaryMerge start end` merges the elements at indices `index` of `list` such that `start <= index < end`
