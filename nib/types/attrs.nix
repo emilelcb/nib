@@ -79,10 +79,12 @@ with builtins; rec {
   mapAttrsRecursiveCond = cond: f: set: let
     recurse = path:
       mapAttrs (
-        name: value:
+        name: value: let
+          next = path ++ [name];
+        in
           if isAttrs value && cond value
-          then recurse (path ++ [name]) value
-          else f (path ++ [name]) value
+          then recurse next value
+          else f next value
       );
   in
     recurse [] set;
