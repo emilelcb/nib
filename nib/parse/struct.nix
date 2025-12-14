@@ -1,11 +1,21 @@
-{nib, ...}:
-with builtins;
-with nib.types; rec {
+{nib, ...}: let
+  Err = nib.types.Err;
+  Ok' = nib.types.Ok';
+  firstErr = nib.types.firstErr;
+
+  unwrapSome = nib.types.unwrapSome;
+
+  isTerminal = nib.types.isTerminal;
+  unwrapTerminal = nib.types.unwrapTerminal;
+
+  mapAttrsRecursiveCond = nib.std.mapAttrsRecursiveCond;
+  attrValueAt = nib.std.attrValueAt;
+in rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
-    if isAttrs S && isAttrs T
+    if builtins.isAttrs S && builtins.isAttrs T
     then let
-      keysS = attrNames S;
-      keysT = attrNames T;
+      keysS = builtins.attrNames S;
+      keysT = builtins.attrNames T;
     in
       # ensure all key names match, then recurse
       if !(keysS == keysT)
@@ -18,7 +28,7 @@ with nib.types; rec {
     else
       # terminating leaf in recursion tree reached
       # ensure values' types match
-      (typeOf S == typeOf T)
+      (builtins.typeOf S == builtins.typeOf T)
       || errBadValues path S T;
 
   cmpStructErr = errBadKeys: errBadValues: cmpStructErr' errBadKeys errBadValues [];
@@ -73,14 +83,14 @@ with nib.types; rec {
     (value:
       if isTerminal value
       then unwrapTerminal value
-      else valueS);
+      else value);
 
   # TODO: Define:
   # TODO: throwUnreachable = throw "Unreachable code was evaluated..";
   # TODO: abortUnreachable = abort "Unreachable code was evaluated...";
-  mergeStruct = mergeStruct' (_: _: Ok');
+  mergeStruct = mergeStructs' (_: _: Ok');
 
   # mergeTypedPartialStruct must evaluate properties (not lazy)
   # for lazy evaluation use mergeStruct instead!
-  mergeTypedPartialStruct = mergeStruct' cmpTypedPartialStruct;
+  mergeTypedPartialStruct = mergeStructs' cmpTypedPartialStruct;
 }

@@ -1,6 +1,6 @@
-{nib, ...}:
-with builtins;
-with nib.types; let
+{nib, ...}: let
+  Res = nib.types.Res;
+  findFirst = nib.std.findFirst;
   # TODO: try get enum generation working (and other type constructors)
   # Maybe = mkEnum "nib::Maybe" {
   #   Some = mkEnumVariant {value = "nix::String";};
@@ -66,7 +66,7 @@ in rec {
   None = Maybe false null;
 
   # Pattern Matching
-  isMaybe = T: attrNames T == ["_some_" "_value_"];
+  isMaybe = T: builtins.attrNames T == ["_some_" "_value_"];
   isSome = T: isMaybe T && T._some_;
   isNone = T: isMaybe T && !T._some_;
 

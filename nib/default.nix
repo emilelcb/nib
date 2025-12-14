@@ -1,55 +1,51 @@
 {systems, ...}: let
-  mergeAttrsList = types.mergeAttrsList;
-
-  submodArgs = {inherit nib;};
-
   # TODO: move this to a new module
   mkMod' = args: mod: import mod args;
-  mkMod = mkMod' submodArgs;
+  mkMod = mkMod' {inherit nib;};
 
-  parse = mkMod ./parse;
+  std = mkMod ./std;
   types = mkMod ./types;
+  parse = mkMod ./parse;
 
-  nib = with types;
-    mergeAttrsList [
-      # submodule content is accessible first by submodule name
-      # then by the name of the content (ie self.submodule.myFunc)
-      {inherit parse types;}
+  nib = std.mergeAttrsList [
+    # submodule content is accessible first by submodule name
+    # then by the name of the content (ie self.submodule.myFunc)
+    {inherit std types parse;}
 
-      # submodule is included directly to this module (ie self.myFunc)
+    # submodule is included directly to this module (ie self.myFunc)
 
-      # this module
-      {
-        # === External Functions ===
-        withPkgs = repo: config: system:
-          import repo {
-            inherit system;
-          }
-          // config;
+    # this module
+    {
+      # === External Functions ===
+      withPkgs = repo: config: system:
+        import repo {
+          inherit system;
+        }
+        // config;
 
-        mkSys = input: let
-          # function taking a system as argument
-          pkgsFor = input.pkgs;
-        in {
-          inherit pkgsFor;
-          forAllSystems = f:
-            genAttrs systems (
-              system: f system (pkgsFor system)
-            );
-        };
+      mkSys = input: let
+        # function taking a system as argument
+        pkgsFor = input.pkgs;
+      in {
+        inherit pkgsFor;
+        forAllSystems = f:
+          std.genAttrs systems (
+            system: f system (pkgsFor system)
+          );
+      };
 
-        mkUSys = input: let
-          # functions taking a system as argument
-          pkgsFor = input.pkgs;
-          upkgsFor = input.upkgs;
-        in {
-          inherit pkgsFor upkgsFor;
-          forAllSystems = f:
-            genAttrs systems (
-              system: f system (pkgsFor system) (upkgsFor system)
-            );
-        };
-      }
-    ];
+      mkUSys = input: let
+        # functions taking a system as argument
+        pkgsFor = input.pkgs;
+        upkgsFor = input.upkgs;
+      in {
+        inherit pkgsFor upkgsFor;
+        forAllSystems = f:
+          std.genAttrs systems (
+            system: f system (pkgsFor system) (upkgsFor system)
+          );
+      };
+    }
+  ];
 in
   nib
