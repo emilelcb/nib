@@ -10,8 +10,12 @@
   };
 
   # Pattern Matching
-  isOk = r: builtins.hasAttr "ok" r && r.ok;
-  isErr = r: builtins.hasAttr "ok" r && !r.ok;
+  isResult = r:
+    (builtins.length (builtins.attrNames r) == 2)
+    && builtins.hasAttr "ok" r
+    && (builtins.hasAttr "value" r || builtins.hasAttr "error" r);
+  isOk = r: isResult r && r.ok;
+  isErr = r: isResult r && !r.ok;
 
   # Unwrap (Monadic Return Operation)
   unwrap = f: r:
