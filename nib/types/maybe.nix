@@ -97,4 +97,9 @@ in rec {
     else f T;
 
   firstSome = findFirst isSome None;
+
+  nullableToMaybe = x:
+    if x == null
+    then None
+    else Some x;
 }
