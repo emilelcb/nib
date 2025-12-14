@@ -1,24 +1,25 @@
-{nib, ...}:
-with builtins;
-with nib.types; let
+{nib, ...}: let
+  crossLists = nib.std.crossLists;
+  identityAttrsMany = nib.std.identityAttrsMany;
+
   # === Internal Helper Functions ===
   toSystemName = arch: platform: "${arch}-${platform}";
   listsToSystemNames = archs: platforms:
     crossLists (arch: platform: toSystemName arch platform)
     [
-      (attrValues archs)
-      (attrValues platforms)
+      (builtins.attrValues archs)
+      (builtins.attrValues platforms)
     ];
 in rec {
   # REF: https://github.com/nix-systems/nix-systems
-  archs = identityAttrsList [
+  archs = identityAttrsMany [
     "x86_64"
     "aarch64"
     "riscv64"
   ];
 
   # REF: https://github.com/nix-systems/nix-systems
-  platforms = identityAttrsList [
+  platforms = identityAttrsMany [
     "linux"
     "darwin"
   ];

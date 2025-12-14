@@ -1,11 +1,12 @@
-{nib, ...}:
-with builtins;
-with nib.types; rec {
+{nib, ...}: let
+  foldl = nib.std.foldl;
+  nullableToMaybe = nib.types.nullableToMany;
+in rec {
   nameValuePair = name: value: {inherit name value;};
 
   identityAttrs = value: {${value} = value;};
 
-  identityAttrsList = values: map (v: identityAttrs v) values;
+  identityAttrsMany = values: map (v: identityAttrs v) values;
 
   /**
   Generate an attribute set by mapping a function over a list of
@@ -75,15 +76,15 @@ with nib.types; rec {
 
   :::
   */
-  genAttrs' = xs: f: listToAttrs (map f xs);
+  genAttrs' = xs: f: builtins.listToAttrs (map f xs);
 
   mapAttrsRecursiveCond = cond: f: set: let
     recurse = path:
-      mapAttrs (
+      builtins.mapAttrs (
         name: value: let
           next = path ++ [name];
         in
-          if isAttrs value && cond value
+          if builtins.isAttrs value && cond value
           then recurse next value
           else f next value
       );
@@ -97,7 +98,7 @@ with nib.types; rec {
   # attribute set at that path
   attrValueAt = let
     value = foldl (l: r:
-      if isAttrs l && hasAttr r l
+      if builtins.isAttrs l && builtins.hasAttr r l
       then l.${r}
       else null);
   in
@@ -115,11 +116,11 @@ with nib.types; rec {
         binaryMerge start (start + (end - start) / 2) // binaryMerge (start + (end - start) / 2) end
       else
         # Otherwise there will be exactly 1 element due to the invariant, in which case we just return it directly
-        elemAt list start;
+        builtins.elemAt list start;
   in
     if list == []
     then
       # Calling binaryMerge as below would not satisfy its invariant
       {}
-    else binaryMerge 0 (length list);
+    else binaryMerge 0 (builtins.length list);
 }

@@ -1,6 +1,6 @@
-{nib, ...}:
-with builtins;
-with nib.types; rec {
+{nib, ...}: let
+  findFirst = nib.std.findFirst;
+in rec {
   # Res (Result) Monad
   Res = success: value: {
     _success_ = success;
@@ -12,7 +12,7 @@ with nib.types; rec {
   Err' = Err "err";
 
   # Pattern Matching
-  isRes = R: attrNames R == ["_success_" "_value_"];
+  isRes = R: builtins.attrNames R == ["_success_" "_value_"];
   isOk = R: isRes R && R._success_;
   isErr = R: isRes R && !R._success_;
 
