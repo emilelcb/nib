@@ -48,25 +48,7 @@
         inherit path;
       });
 
-  # check is a function taking two structs
-  # and returning a result monad.
-  mergeStruct' = check: template: S: let
-    res = check template S;
-  in
-    result.errOr res ({...}:
-      attrs.mapAttrsRecursive (
-        path: value: let
-          valueS = attrs.attrValueAt S path;
-        in
-          if valueS != null
-          then valueS
-          else value
-      )
-      template);
-
-  mergeStruct = mergeStruct' (S: T: result.Ok "ok");
-
-  mergeTypedStruct = mergeStruct' (
+  cmpTypedPartialStruct =
     cmpStructErr
     (path: keysS: keysT:
       result.Ok "ok")
@@ -74,10 +56,30 @@
       result.Err {
         reason = "values";
         inherit path;
-      })
-  );
+      });
 
-  mergeStructStrict = mergeStruct' cmpStruct;
+  # check is a function taking two structs
+  # and returning a result monad.
+  mergeStruct' = check: template: S: let
+    res = check template S;
+  in
+    result.errOr res ({...}:
+      result.Ok (
+        attrs.mapAttrsRecursive (
+          path: value: let
+            valueS = attrs.attrValueAt S path;
+          in
+            if valueS != null
+            then valueS
+            else value
+        )
+        template
+      ));
 
-  mergeTypedStructStrict = mergeStruct' cmpTypedStruct;
+  # mergeStruct ensures no properties are evaluated (entirely lazy)
+  mergeStruct = mergeStruct' (S: T: result.Ok "ok");
+
+  # mergeTypedPartialStruct must evaluate properties (not lazy)
+  # for lazy evaluation use mergeStruct instead!
+  mergeTypedPartialStruct = mergeStruct' cmpTypedPartialStruct;
 }
