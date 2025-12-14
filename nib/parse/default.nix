@@ -1,6 +1,7 @@
 {
   attrs,
   result,
+  ...
 }: let
   struct = import ./struct.nix {inherit attrs result;};
 in

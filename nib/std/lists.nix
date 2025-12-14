@@ -1,4 +1,4 @@
-{}: rec {
+{...}: rec {
   foldl = op: nul: list: let
     foldl' = n:
       if n == -1

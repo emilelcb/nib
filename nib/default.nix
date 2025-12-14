@@ -2,6 +2,7 @@
   std = import ./std {};
   parse = import ./parse {
     attrs = std.attrs;
+    lists = std.lists;
     result = std.result;
   };
 in

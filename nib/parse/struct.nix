@@ -1,6 +1,7 @@
 {
   attrs,
   result,
+  ...
 }: rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
     if builtins.isAttrs S && builtins.isAttrSet T

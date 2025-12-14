@@ -1,6 +1,7 @@
 {
   attrs,
   lists,
+  ...
 }: let
   # === Internal Helper Functions ===
   toSystemName = arch: platform: "${arch}-${platform}";

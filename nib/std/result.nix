@@ -1,4 +1,4 @@
-{lists}: rec {
+{lists, ...}: rec {
   # Result Monad
   Ok = value: {
     ok = true;
