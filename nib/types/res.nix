@@ -21,8 +21,8 @@ with nib.types; rec {
     if isOk R
     then f R._value_
     else g R._value_;
-  unwrapOk = f: unwrapRes f (R: R._value_);
-  unwrapErr = f: unwrapRes (R: R._value_) f;
+  unwrapOk = f: unwrapRes (R: R._value_) f;
+  unwrapErr = f: unwrapRes f (R: R._value_);
 
   # Map (Monadic Bind Operation)
   mapRes = f: g: unwrapRes (R: Ok (f R)) (R: Err (f R));
