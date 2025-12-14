@@ -1,12 +1,13 @@
 {nib, ...}:
+with builtins;
 with nib.types; let
   # === Internal Helper Functions ===
   toSystemName = arch: platform: "${arch}-${platform}";
   listsToSystemNames = archs: platforms:
     crossLists (arch: platform: toSystemName arch platform)
     [
-      (builtins.attrValues archs)
-      (builtins.attrValues platforms)
+      (attrValues archs)
+      (attrValues platforms)
     ];
 in rec {
   # REF: https://github.com/nix-systems/nix-systems
