@@ -1,12 +1,17 @@
 {systems, ...}: let
+  mergeAttrsList = std.attrs.mergeAttrsList;
+
   std = import ./std {};
-  parse = import ./parse {
+  stdSubMods = {
     attrs = std.attrs;
+    fault = std.fault;
     lists = std.lists;
     result = std.result;
   };
+
+  parse = import ./parse (mergeAttrsList [stdSubMods]);
 in
-  std.attrs.mergeAttrsList [
+  mergeAttrsList [
     # submodule content is accessible first by submodule name
     # then by the name of the content (ie self.submodule.myFunc)
     {inherit parse;}
