@@ -2,8 +2,8 @@
   attrs,
   result,
   ...
-}: let
-  struct = import ./struct.nix {inherit attrs result;};
+} @ args: let
+  struct = import ./struct.nix args;
 in
   attrs.mergeAttrsList [
     # submodule is included directly to this module (ie self.myFunc)
