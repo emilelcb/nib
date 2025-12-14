@@ -1,26 +1,23 @@
-{
-  attrs,
-  lists,
-  ...
-}: let
+{nib, ...}:
+with nib.types; let
   # === Internal Helper Functions ===
   toSystemName = arch: platform: "${arch}-${platform}";
   listsToSystemNames = archs: platforms:
-    lists.crossLists (arch: platform: toSystemName arch platform)
+    crossLists (arch: platform: toSystemName arch platform)
     [
       (builtins.attrValues archs)
       (builtins.attrValues platforms)
     ];
 in rec {
   # REF: https://github.com/nix-systems/nix-systems
-  archs = attrs.identityAttrsList [
+  archs = identityAttrsList [
     "x86_64"
     "aarch64"
     "riscv64"
   ];
 
   # REF: https://github.com/nix-systems/nix-systems
-  platforms = attrs.identityAttrsList [
+  platforms = identityAttrsList [
     "linux"
     "darwin"
   ];

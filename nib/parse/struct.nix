@@ -1,8 +1,7 @@
-{
-  attrs,
-  result,
-  ...
-}: rec {
+{nib, ...}:
+with nib.types; let
+  attrs = nib.attrs;
+in rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
     if builtins.isAttrs S && builtins.isAttrs T
     then let
@@ -13,7 +12,7 @@
       if !(keysS == keysT)
       then errBadKeys path keysS keysT
       else
-        (result.firstErr
+        (firstErr
           (builtins.map
             (k: cmpStructErr' errBadKeys errBadValues (path ++ [k]) (keysS.${k}) (keysT.${k}))
             keysS))
@@ -27,33 +26,31 @@
 
   cmpStruct =
     cmpStructErr
-    (path: keysS: keysT:
-      result.Err {
+    (path: _: _:
+      Err {
         reason = "keys";
         inherit path;
       })
-    (path: S: T:
-      result.Ok "ok");
+    (_: _: _: Ok');
 
   cmpTypedStruct =
     cmpStructErr
-    (path: keysS: keysT:
-      result.Err {
+    (path: _: _:
+      Err {
         reason = "keys";
         inherit path;
       })
-    (path: S: T:
-      result.Err {
+    (path: _: _:
+      Err {
         reason = "values";
         inherit path;
       });
 
   cmpTypedPartialStruct =
     cmpStructErr
-    (path: keysS: keysT:
-      result.Ok "ok")
-    (path: S: T:
-      result.Err {
+    (_: _: _: Ok')
+    (path: _: _:
+      Err {
         reason = "values";
         inherit path;
       });
@@ -61,10 +58,10 @@
   # check is a function taking two structs
   # and returning a result monad.
   mergeStruct' = check: template: S: let
-    res = check template S;
+    R = check template S;
   in
-    result.errOr res ({...}:
-      result.Ok (
+    errOr ({...}:
+      Ok (
         attrs.mapAttrsRecursive (
           path: value: let
             valueS = attrs.attrValueAt S path;
@@ -74,10 +71,11 @@
             else value
         )
         template
-      ));
+      ))
+    R;
 
   # mergeStruct ensures no properties are evaluated (entirely lazy)
-  mergeStruct = mergeStruct' (S: T: result.Ok "ok");
+  mergeStruct = mergeStruct' (_: _: Ok');
 
   # mergeTypedPartialStruct must evaluate properties (not lazy)
   # for lazy evaluation use mergeStruct instead!

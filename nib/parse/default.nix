@@ -1,11 +1,7 @@
-{
-  attrs,
-  result,
-  ...
-} @ args: let
+{nib, ...} @ args: let
   struct = import ./struct.nix args;
 in
-  attrs.mergeAttrsList [
+  nib.types.mergeAttrsList [
     # submodule is included directly to this module (ie self.myFunc)
     struct
 

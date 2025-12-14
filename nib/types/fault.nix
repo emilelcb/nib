@@ -9,8 +9,8 @@
   isFault = F: builtins.attrNames F == ["error"];
 
   # Unwrap (Monadic Return Operation)
-  unwrap = F: F.error;
+  unwrapFault = F: F.error;
 
   # Map (Monadic Bind Operation)
-  map = f: F: Fault (f (unwrap F));
+  mapFault = f: F: Fault (f (unwrapFault F));
 }
