@@ -68,9 +68,9 @@ in rec {
     mapAttrsRecursiveCond
     cond
     (path: valueS: let
-      valueT = attrValueAt T path;
+      maybeValueT = attrValueAt T path;
     in
-      unwrapSome valueT (_: f valueS))
+      unwrapSome (_: f valueS) maybeValueT)
     S;
 
   # mergeStruct ensures no properties are evaluated (entirely lazy)
