@@ -1,8 +1,8 @@
-{...}: let
-  attrs = import ./attrs.nix {inherit lists;};
-  fault = import ./fault.nix {};
-  lists = import ./lists.nix {};
-  result = import ./result.nix {inherit lists;};
+{nib, ...} @ args: let
+  attrs = import ./attrs.nix args;
+  fault = import ./fault.nix args;
+  lists = import ./lists.nix args;
+  result = import ./result.nix args;
 in
   attrs.mergeAttrsList [
     # submodule is included directly to this module (ie self.myFunc)
