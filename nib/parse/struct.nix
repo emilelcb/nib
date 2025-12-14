@@ -54,26 +54,30 @@ with nib.types; rec {
         inherit path;
       });
 
-  # check is a function taking two structs
-  # and returning a result monad.
-  mergeStruct' = check: template: S: let
-    R = check template S;
-  in
-    errOr ({...}:
-      Ok (
-        mapAttrsRecursive (
-          path: value: let
-            valueS = attrValueAt S path;
-          in
-            if valueS != null
-            then valueS
-            else value
-        )
-        template
-      ))
-    R;
+  mergeStructs' = f: cond: S: T:
+    mapAttrsRecursiveCond
+    cond
+    (path: valueS: let
+      valueT = attrValueAt T path;
+    in
+      unwrapSome valueT (_: f valueS))
+    S;
 
   # mergeStruct ensures no properties are evaluated (entirely lazy)
+  mergeStructs = mergeStruct (x: x);
+
+  # given a template struct, and the struct to parse
+  parseStructFor =
+    mergeStructs'
+    (leaf: !isTerminal leaf)
+    (value:
+      if isTerminal value
+      then unwrapTerminal value
+      else valueS);
+
+  # TODO: Define:
+  # TODO: throwUnreachable = throw "Unreachable code was evaluated..";
+  # TODO: abortUnreachable = abort "Unreachable code was evaluated...";
   mergeStruct = mergeStruct' (_: _: Ok');
 
   # mergeTypedPartialStruct must evaluate properties (not lazy)
