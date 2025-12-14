@@ -1,7 +1,7 @@
 {...}: let
   attrs = import ./attrs.nix {inherit lists;};
   lists = import ./lists.nix {};
-  result = import ./lists.nix {inherit lists;};
+  result = import ./result.nix {inherit lists;};
 in
   attrs.mergeAttrsList [
     # submodule is included directly to this module (ie self.myFunc)
