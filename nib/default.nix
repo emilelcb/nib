@@ -6,11 +6,12 @@
   std = mkMod ./std;
   types = mkMod ./types;
   parse = mkMod ./parse;
+  panic = mkMod ./panic.nix;
 
   nib = std.mergeAttrsList [
     # submodule content is accessible first by submodule name
     # then by the name of the content (ie self.submodule.myFunc)
-    {inherit std types parse;}
+    {inherit std types panic parse;}
 
     # submodule is included directly to this module (ie self.myFunc)
 

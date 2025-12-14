@@ -62,28 +62,34 @@ in rec {
     _some_ = some; # allows _value_ to be null (yuck!!)
     _value_ = value;
   };
-  Some = value: Res true value;
+  Some = Res true;
   None = Maybe false null;
 
-  # Pattern Matching
+  # Pattern Matching (unsafe and safe variants)
   isMaybe = T: builtins.attrNames T == ["_some_" "_value_"];
-  isSome = T: isMaybe T && T._some_;
-  isNone = T: isMaybe T && !T._some_;
+  isSome' = T: isMaybe T && T._some_;
+  isSome = T:
+    assert isMaybe T || nib.panic.badType "Maybe" T;
+      isSome' T;
+  isNone' = T: isMaybe T && !T._some_;
+  isNone = T:
+    assert isMaybe T || nib.panic.badType "Maybe" T;
+      isNone' T;
 
+  # TODO: ensure you check isNone if isSome fails (otherwise it could be another type!)
   # Unwrap (Monadic Return Operation)
   unwrapMaybe = f: g: T:
     if isSome T
     then f T._value_
     else g T._value_;
+  unwrapSome = unwrapMaybe (v: v);
+  unwrapNone = f: unwrapMaybe f (v: v);
 
   # Map (Monadic Bind Operation)
-  mapMaybe = f: T:
-    if isSome T
-    then Some (f T._value_)
-    else None;
+  mapMaybe = f: unwrapMaybe (v: Some (f v)) (_: None);
   # NOTE: yes this does nothing, its only here so I don't forget
   # NOTE: (ie when pregenerating monadic operations with a custom ADT module)
-  mapSome = f: mapMaybe f;
+  mapSome = mapMaybe;
 
   # Conditionals
   someOr = f: T:
@@ -96,7 +102,7 @@ in rec {
     then T
     else f T;
 
-  firstSome = findFirst isSome None;
+  firstSome = findFirst isSome' None;
 
   nullableToMaybe = x:
     if x == null

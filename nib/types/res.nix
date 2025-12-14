@@ -6,28 +6,34 @@ in rec {
     _success_ = success;
     _value_ = value;
   };
-  Ok = value: Res true value;
+  Ok = Res true;
   Ok' = Ok "ok";
-  Err = value: Res false value;
+  Err = Res false;
   Err' = Err "err";
 
   # Pattern Matching
   isRes = R: builtins.attrNames R == ["_success_" "_value_"];
-  isOk = R: isRes R && R._success_;
-  isErr = R: isRes R && !R._success_;
+  isOk' = R: isRes R && R._success_;
+  isOk = R:
+    assert isRes R || nib.panic.badType "Res" R;
+      isOk' R;
+  isErr' = R: isRes R && !R._success_;
+  isErr = R:
+    assert isRes R || nib.panic.badType "Res" R;
+      isErr' R;
 
   # Unwrap (Monadic Return Operation)
   unwrapRes = f: g: R:
     if isOk R
     then f R._value_
     else g R._value_;
-  unwrapOk = f: unwrapRes (R: R._value_) f;
-  unwrapErr = f: unwrapRes f (R: R._value_);
+  unwrapOk = unwrapRes (v: v);
+  unwrapErr = f: unwrapRes f (v: v);
 
   # Map (Monadic Bind Operation)
-  mapRes = f: g: unwrapRes (R: Ok (f R)) (R: Err (f R));
-  mapOk = f: mapRes f (x: x);
-  mapErr = f: mapRes (x: x) f;
+  mapRes = f: g: unwrapRes (v: Ok (f v)) (v: Err (f v));
+  mapOk = f: mapRes f (v: v);
+  mapErr = f: mapRes (v: v) f;
 
   # Conditionals
   okOr = f: R:
@@ -41,5 +47,5 @@ in rec {
     else f R;
 
   # Standard Helpers
-  firstErr = findFirst isErr Ok';
+  firstErr = findFirst isErr' Ok';
 }

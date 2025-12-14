@@ -1,4 +1,4 @@
-{...}: rec {
+{nib, ...}: rec {
   # Fault Monad
   # Wrapper around an error (ie builtins.abort)
   Fault = error: {
@@ -6,11 +6,13 @@
   };
 
   # Pattern Matching
-  isFault = F: builtins.attrNames F == ["_error_"];
+  isFault = T: builtins.attrNames T == ["_error_"];
 
   # Unwrap (Monadic Return Operation)
-  unwrapFault = F: F._error_;
+  unwrapFault = T:
+    assert isFault T || nib.panic.badType "Fault" T;
+      T._error_;
 
   # Map (Monadic Bind Operation)
-  mapFault = f: F: Fault (f (unwrapFault F));
+  mapFault = f: T: Fault (f (unwrapFault T));
 }
