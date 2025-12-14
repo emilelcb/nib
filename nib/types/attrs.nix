@@ -1,5 +1,6 @@
 {nib, ...}:
-with builtins; rec {
+with builtins;
+with nib.types; rec {
   nameValuePair = name: value: {inherit name value;};
 
   identityAttrs = value: {${value} = value;};
@@ -94,7 +95,7 @@ with builtins; rec {
   # form: attrValueAt :: xs -> path -> value
   # given path as a list of strings, return that value of an
   # attribute set at that path
-  attrValueAt = nib.types.foldl (l: r:
+  attrValueAt = foldl (l: r:
     if l != null && hasAttr r l
     then l.${r}
     else null);
