@@ -1,5 +1,6 @@
 {nib, ...}:
-with builtins; rec {
+with builtins;
+with nib.types; rec {
   # Res (Result) Monad
   Res = success: value: {inherit success value;};
   Ok = value: Res true value;
@@ -37,5 +38,5 @@ with builtins; rec {
     then R
     else f R;
 
-  firstErr = nib.types.findFirst isErr Ok';
+  firstErr = findFirst isErr Ok';
 }
