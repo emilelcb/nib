@@ -4,7 +4,7 @@
   ...
 }: rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
-    if builtins.isAttrs S && builtins.isAttrSet T
+    if builtins.isAttrs S && builtins.isAttrs T
     then let
       keysS = builtins.attrNames S;
       keysT = builtins.attrNames T;
