@@ -1,4 +1,5 @@
-{...}: rec {
+{...}:
+with builtins; rec {
   # Fault Monad
   # Wrapper around an error (ie builtins.abort)
   Fault = error: {
@@ -6,7 +7,7 @@
   };
 
   # Pattern Matching
-  isFault = F: builtins.attrNames F == ["error"];
+  isFault = F: attrNames F == ["error"];
 
   # Unwrap (Monadic Return Operation)
   unwrapFault = F: F.error;

@@ -1,13 +1,14 @@
-{...}: rec {
+{...}:
+with builtins; rec {
   foldl = op: nul: list: let
     foldl' = n:
       if n == -1
       then nul
-      else op (foldl' (n - 1)) (builtins.elemAt list n);
+      else op (foldl' (n - 1)) (elemAt list n);
   in
-    foldl' (builtins.length list - 1);
+    foldl' (length list - 1);
 
-  crossLists = f: foldl (fs: args: builtins.concatMap (f: map f args) fs) [f];
+  crossLists = f: foldl (fs: args: concatMap (f: map f args) fs) [f];
 
   findFirstIndex = pred: default: list: let
     # A naive recursive implementation would be much simpler, but
@@ -23,7 +24,7 @@
     #
     # We start with index -1 and the 0'th element of the list, which satisfies the invariant
     resultIndex =
-      builtins.foldl' (
+      foldl' (
         index: el:
           if index < 0
           then
@@ -50,5 +51,5 @@
   in
     if index == null
     then default
-    else builtins.elemAt list index;
+    else elemAt list index;
 }

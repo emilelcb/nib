@@ -1,23 +1,23 @@
 {nib, ...}:
 with builtins nib.types; rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
-    if builtins.isAttrs S && builtins.isAttrs T
+    if isAttrs S && isAttrs T
     then let
-      keysS = builtins.attrNames S;
-      keysT = builtins.attrNames T;
+      keysS = attrNames S;
+      keysT = attrNames T;
     in
       # ensure all key names match, then recurse
       if !(keysS == keysT)
       then errBadKeys path keysS keysT
       else
         (firstErr
-          (builtins.map
+          (map
             (k: cmpStructErr' errBadKeys errBadValues (path ++ [k]) (keysS.${k}) (keysT.${k}))
             keysS))
     else
       # terminating leaf in recursion tree reached
       # ensure values' types match
-      (builtins.typeOf S == builtins.typeOf T)
+      (typeOf S == typeOf T)
       || errBadValues path S T;
 
   cmpStructErr = errBadKeys: errBadValues: cmpStructErr' errBadKeys errBadValues [];
@@ -60,9 +60,9 @@ with builtins nib.types; rec {
   in
     errOr ({...}:
       Ok (
-        attrs.mapAttrsRecursive (
+        mapAttrsRecursive (
           path: value: let
-            valueS = attrs.attrValueAt S path;
+            valueS = attrValueAt S path;
           in
             if valueS != null
             then valueS

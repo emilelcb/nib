@@ -1,9 +1,10 @@
-{nib, ...}: rec {
+{nib, ...}:
+with builtins; rec {
   nameValuePair = name: value: {inherit name value;};
 
   identityAttrs = value: {${value} = value;};
 
-  identityAttrsList = values: builtins.map (v: identityAttrs v) values;
+  identityAttrsList = values: map (v: identityAttrs v) values;
 
   /**
   Generate an attribute set by mapping a function over a list of
@@ -73,13 +74,13 @@
 
   :::
   */
-  genAttrs' = xs: f: builtins.listToAttrs (map f xs);
+  genAttrs' = xs: f: listToAttrs (map f xs);
 
   mapAttrsRecursiveCond = cond: f: set: let
     recurse = path:
-      builtins.mapAttrs (
+      mapAttrs (
         name: value:
-          if builtins.isAttrs value && cond value
+          if isAttrs value && cond value
           then recurse (path ++ [name]) value
           else f (path ++ [name]) value
       );
@@ -92,7 +93,7 @@
   # given path as a list of strings, return that value of an
   # attribute set at that path
   attrValueAt = nib.types.foldl (l: r:
-    if l != null && builtins.hasAttr r l
+    if l != null && hasAttr r l
     then l.${r}
     else null);
 
@@ -108,11 +109,11 @@
         binaryMerge start (start + (end - start) / 2) // binaryMerge (start + (end - start) / 2) end
       else
         # Otherwise there will be exactly 1 element due to the invariant, in which case we just return it directly
-        builtins.elemAt list start;
+        elemAt list start;
   in
     if list == []
     then
       # Calling binaryMerge as below would not satisfy its invariant
       {}
-    else binaryMerge 0 (builtins.length list);
+    else binaryMerge 0 (length list);
 }

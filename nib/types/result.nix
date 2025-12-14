@@ -1,4 +1,5 @@
-{nib, ...}: rec {
+{nib, ...}:
+with builtins; rec {
   # Res (Result) Monad
   Res = success: value: {inherit success value;};
   Ok = value: Res true value;
@@ -7,7 +8,7 @@
   Err' = Err "err";
 
   # Pattern Matching
-  isRes = R: builtins.attrNames R == ["success" "value"];
+  isRes = R: attrNames R == ["success" "value"];
   isOk = R: isRes R && R.success;
   isErr = R: isRes R && !R.success;
 
