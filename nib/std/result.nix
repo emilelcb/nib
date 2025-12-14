@@ -1,29 +1,26 @@
 {lists, ...}: rec {
   # Result Monad
   Ok = value: {
-    ok = true;
+    success = true;
     value = value;
   };
   Err = err: {
-    ok = false;
-    error = err;
+    success = false;
+    value = err;
   };
 
   # Pattern Matching
-  isResult = r:
-    (builtins.length (builtins.attrNames r) == 2)
-    && builtins.hasAttr "ok" r
-    && (builtins.hasAttr "value" r || builtins.hasAttr "error" r);
-  isOk = r: isResult r && r.ok;
-  isErr = r: isResult r && !r.ok;
+  isResult = r: builtins.attrNames r == ["success" "value"];
+  isOk = r: isResult r && r.success;
+  isErr = r: isResult r && !r.success;
 
   # Unwrap (Monadic Return Operation)
   unwrap = f: r:
     if isOk r
     then r.value
-    else f r.error;
+    else f r.value;
 
-  unwrapDefault = default: unwrap (x: default);
+  unwrapDefault = default: unwrap (_: default);
 
   # Map (Monadic Bind Operation)
   identity = r: r;
