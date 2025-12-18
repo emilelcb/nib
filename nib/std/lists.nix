@@ -1,4 +1,9 @@
-{...}: rec {
+{nib, ...}: let
+  inherit
+    (nib.std)
+    min
+    ;
+in rec {
   foldl = op: nul: list: let
     foldl' = n:
       if n == -1
@@ -52,5 +57,8 @@
     then default
     else builtins.elemAt list index;
 
-  zipLists = zipListsWith (fst: snd: {inherit fst snd;});
+  zipListsWith = f: fst: snd:
+    builtins.genList (n: f (builtins.elemAt fst n) (builtins.elemAt snd n)) (min (builtins.length fst) (builtins.length snd));
+
+  # zipLists = zipListsWith (fst: snd: {inherit fst snd;});
 }
