@@ -6,7 +6,7 @@
   std = mkMod ./std;
   panic = mkMod ./panic.nix;
   parse = mkMod ./parse;
-  patterns = mkMod ./patterns.nix;
+  # patterns = mkMod ./patterns.nix;
 
   types = mkMod ./types;
   typesystem = mkMod ./typesystem.nix;
@@ -19,7 +19,7 @@
     {inherit std types panic parse;}
 
     # submodule content accessible directly (ie self.myFunc)
-    patterns
+    # patterns
     typesystem
     sys
   ];
