@@ -4,9 +4,13 @@
   mkMod = mkMod' {inherit systems nib;};
 
   std = mkMod ./std;
-  types = mkMod ./types;
-  parse = mkMod ./parse;
   panic = mkMod ./panic.nix;
+  parse = mkMod ./parse;
+  patterns = mkMod ./patterns.nix;
+
+  types = mkMod ./types;
+  typesystem = mkMod ./typesystem.nix;
+
   sys = mkMod ./sys.nix;
 
   nib = std.mergeAttrsList [
@@ -15,6 +19,8 @@
     {inherit std types panic parse;}
 
     # submodule content accessible directly (ie self.myFunc)
+    patterns
+    typesystem
     sys
   ];
 in

@@ -10,4 +10,12 @@ in
     maybe
     res
     terminal
+
+    rec {
+      # TODO
+      isAlgebraic = T: false;
+
+      isList = T: !isAlgebraic T && builtins.isList T;
+      isAttrs = T: !isAlgebraic T && builtins.isAttrs T;
+    }
   ]
