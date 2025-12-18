@@ -64,33 +64,42 @@ in rec {
         inherit path;
       });
 
-  mergeStructs' = f: cond: S: T:
-    mapAttrsRecursiveCond
+  # Alternative to mapAttrsRecursiveCond
+  recmapCondFrom = path: cond: f: T: let
+    delegate = path': recmapCondFrom path' cond f;
+  in
+    if builtins.isAttrs T && cond path T
+    then builtins.mapAttrs (attr: leaf: delegate (path ++ [attr]) leaf) T
+    # else if builtins.isList T
+    # then map (leaf: delegate leaf)
+    else f path T;
+
+  recmapCond = recmapCondFrom [];
+
+  # Alternative to mapAttrsRecursive
+  # NOTE: refuses to go beyond Terminal types
+  recmap = recmapCond (_: leaf: !isTerminal leaf);
+
+  mergeStructsCond = cond: f: base: ext:
+    recmapCond
     cond
-    (path: valueS: let
-      maybeValueT = attrValueAt T path;
-    in
-      unwrapSome (_: f valueS) maybeValueT)
-    S;
+    (path: leaf:
+      attrValueAt path ext
+      |> unwrapSome (_: f leaf))
+    base;
 
   # mergeStruct ensures no properties are evaluated (entirely lazy)
-  mergeStructs = mergeStruct (x: x);
+  # TODO: should this be called "overlayStructs" or something? (its not exactly a merge...)
+  # NOTE: respects Terminal types
+  mergeStructs =
+    mergeStructsCond
+    (_: leaf: !isTerminal leaf)
+    (leaf:
+      if isTerminal leaf
+      then unwrapTerminal leaf
+      else leaf);
 
-  # given a template struct, and the struct to parse
-  parseStructFor =
-    mergeStructs'
-    (leaf: !isTerminal leaf)
-    (value:
-      if isTerminal value
-      then unwrapTerminal value
-      else value);
-
-  # TODO: Define:
-  # TODO: throwUnreachable = throw "Unreachable code was evaluated..";
-  # TODO: abortUnreachable = abort "Unreachable code was evaluated...";
-  mergeStruct = mergeStructs' (_: _: Ok');
-
-  # mergeTypedPartialStruct must evaluate properties (not lazy)
-  # for lazy evaluation use mergeStruct instead!
-  mergeTypedPartialStruct = mergeStructs' cmpTypedPartialStruct;
+  # # mergeTypedPartialStruct must evaluate properties (not lazy)
+  # # for lazy evaluation use mergeStruct instead!
+  # mergeTypedPartialStruct = mergeStructs' cmpTypedPartialStruct;
 }
