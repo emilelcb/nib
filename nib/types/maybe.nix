@@ -1,5 +1,4 @@
 {nib, ...}: let
-  Res = nib.types.Res;
   findFirst = nib.std.findFirst;
   # TODO: try get enum generation working (and other type constructors)
   # Maybe = mkEnum "nib::Maybe" {
@@ -62,7 +61,7 @@ in rec {
     _some_ = some; # allows _value_ to be null (yuck!!)
     _value_ = value;
   };
-  Some = Res true;
+  Some = Maybe true;
   None = Maybe false null;
 
   # Pattern Matching (unsafe and safe variants)
