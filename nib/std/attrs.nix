@@ -93,16 +93,17 @@ in rec {
 
   mapAttrsRecursive = f: set: mapAttrsRecursiveCond (as: true) f set;
 
-  # form: attrValueAt :: xs -> path -> value
+  # form: attrValueAt :: list string -> set -> Maybe Any
   # given path as a list of strings, return that value of an
   # attribute set at that path
-  attrValueAt = let
-    value = foldl (l: r:
-      if builtins.isAttrs l && builtins.hasAttr r l
-      then l.${r}
-      else null);
-  in
-    nullableToMaybe value;
+  attrValueAt = path: xs:
+    foldl (left: right:
+      if builtins.isAttrs left && builtins.hasAttr right left
+      then left.${right}
+      else null)
+    xs
+    path
+    |> nullableToMaybe;
 
   mergeAttrsList = list: let
     # `binaryMerge start end` merges the elements at indices `index` of `list` such that `start <= index < end`

@@ -51,4 +51,6 @@
     if index == null
     then default
     else builtins.elemAt list index;
+
+  zipLists = zipListsWith (fst: snd: {inherit fst snd;});
 }
