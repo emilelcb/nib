@@ -1,6 +1,9 @@
 {nib, ...}: let
   foldl = nib.std.foldl;
-  nullableToMaybe = nib.types.nullableToMany;
+  inherit
+    (nib.types)
+    nullableToMaybe
+    ;
 in rec {
   nameValuePair = name: value: {inherit name value;};
 
