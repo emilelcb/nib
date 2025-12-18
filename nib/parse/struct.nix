@@ -78,7 +78,7 @@ in rec {
 
   # Alternative to mapAttrsRecursive
   # NOTE: refuses to go beyond Terminal types
-  recmap = recmapCond (_: leaf: !isTerminal leaf);
+  recmap = recmapCond (_: leaf: !(isTerminal leaf));
 
   mergeStructsCond = cond: f: base: ext:
     recmapCond
@@ -93,7 +93,7 @@ in rec {
   # NOTE: respects Terminal types
   mergeStructs =
     mergeStructsCond
-    (_: leaf: !isTerminal leaf)
+    (_: leaf: !(isTerminal leaf))
     (leaf:
       if isTerminal leaf
       then unwrapTerminal leaf
