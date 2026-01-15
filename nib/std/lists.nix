@@ -69,4 +69,17 @@ in rec {
     genList (n: f (elemAt fst n) (elemAt snd n)) (min (length fst) (length snd));
 
   # zipLists = zipListsWith (fst: snd: {inherit fst snd;});
+
+  sublist = start: count: list: let
+    len = length list;
+  in
+    genList (n: elemAt list (n + start)) (
+      if start >= len
+      then 0
+      else if start + count > len
+      then len - start
+      else count
+    );
+
+  take = sublist 0;
 }
