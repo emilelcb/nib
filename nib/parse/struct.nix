@@ -95,7 +95,7 @@ in rec {
   # overrideStruct ensures no properties are evaluated (entirely lazy)
   # TODO: should this be called "overlayStructs" or something? (its not exactly a override...)
   # NOTE: respects Terminal types
-  overrideStructs =
+  overrideStruct =
     overrideStructCond
     (_: leaf: !(isTerminal leaf))
     (leaf:
