@@ -8,7 +8,8 @@
 
   # Pattern Matching
   isTerminal = T:
-    (builtins.attrNames T == ["_nbtype_" "_value_"])
+    builtins.isAttrs T
+    && builtins.attrNames T == ["_nbtype_" "_value_"]
     && T._nbtype_ == "nib::Terminal";
 
   # Unwrap (Monadic Return Operation)
