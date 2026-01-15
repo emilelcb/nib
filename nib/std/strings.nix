@@ -9,7 +9,7 @@
     ;
 
   inherit
-    (nib.trivial)
+    (nib.std)
     warnIf
     ;
 in rec {
