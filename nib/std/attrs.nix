@@ -5,6 +5,7 @@
     attrNames
     elemAt
     filter
+    getAttr
     hasAttr
     isAttrs
     length
@@ -29,6 +30,11 @@ in rec {
   identityAttrsMany = values: map (v: identityAttrs v) values;
 
   hasAttrs = list: xs: all (x: hasAttr x xs) list;
+
+  getAttrOr = name: xs: default:
+    if hasAttr name xs
+    then getAttr name xs
+    else default;
 
   /**
   Like `genAttrs`, but allows the name of each attribute to be specified in addition to the value.
