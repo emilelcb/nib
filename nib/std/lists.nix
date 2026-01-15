@@ -1,5 +1,13 @@
 {nib, ...}: let
   inherit
+    (builtins)
+    concatMap
+    elemAt
+    foldl'
+    genList
+    length
+    ;
+  inherit
     (nib.std)
     min
     ;

@@ -1,15 +1,18 @@
 {nib, ...}: let
-  Err = nib.types.Err;
-  Ok' = nib.types.Ok';
-  firstErr = nib.types.firstErr;
+  inherit
+    (nib.types)
+    Err
+    Ok'
+    firstErr
+    unwrapSome
+    isTerminal
+    unwrapTerminal
+    ;
 
-  unwrapSome = nib.types.unwrapSome;
-
-  isTerminal = nib.types.isTerminal;
-  unwrapTerminal = nib.types.unwrapTerminal;
-
-  mapAttrsRecursiveCond = nib.std.mapAttrsRecursiveCond;
-  attrValueAt = nib.std.attrValueAt;
+  inherit
+    (nib.std)
+    attrValueAt
+    ;
 in rec {
   cmpStructErr' = errBadKeys: errBadValues: path: S: T:
     if builtins.isAttrs S && builtins.isAttrs T
