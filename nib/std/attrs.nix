@@ -28,38 +28,7 @@ in rec {
 
   identityAttrsMany = values: map (v: identityAttrs v) values;
 
-  /**
-  Generate an attribute set by mapping a function over a list of
-  attribute names.
-
-  # Inputs
-
-  `names`
-
-  : Names of values in the resulting attribute set.
-
-  `f`
-
-  : A function, given the name of the attribute, returns the attribute's value.
-
-  # Type
-
-  ```
-  genAttrs :: [ String ] -> (String -> Any) -> AttrSet
-  ```
-
-  # Examples
-  :::{.example}
-  ## `lib.attrsets.genAttrs` usage example
-
-  ```nix
-  genAttrs [ "foo" "bar" ] (name: "x_" + name)
-  => { foo = "x_foo"; bar = "x_bar"; }
-  ```
-
-  :::
-  */
-  genAttrs = names: f: genAttrs' names (n: nameValuePair n (f n));
+  hasAttrs = list: xs: all (x: hasAttr x xs) list;
 
   /**
   Like `genAttrs`, but allows the name of each attribute to be specified in addition to the value.
@@ -96,15 +65,48 @@ in rec {
 
   :::
   */
-  genAttrs' = xs: f: builtins.listToAttrs (map f xs);
+  genAttrs' = xs: f: listToAttrs (map f xs);
+
+  /**
+  Generate an attribute set by mapping a function over a list of
+  attribute names.
+
+  # Inputs
+
+  `names`
+
+  : Names of values in the resulting attribute set.
+
+  `f`
+
+  : A function, given the name of the attribute, returns the attribute's value.
+
+  # Type
+
+  ```
+  genAttrs :: [ String ] -> (String -> Any) -> AttrSet
+  ```
+
+  # Examples
+  :::{.example}
+  ## `lib.attrsets.genAttrs` usage example
+
+  ```nix
+  genAttrs [ "foo" "bar" ] (name: "x_" + name)
+  => { foo = "x_foo"; bar = "x_bar"; }
+  ```
+
+  :::
+  */
+  genAttrs = names: f: genAttrs' names (n: nameValuePair n (f n));
 
   mapAttrsRecursiveCond = cond: f: set: let
     recurse = path:
-      builtins.mapAttrs (
+      mapAttrs (
         name: value: let
           next = path ++ [name];
         in
-          if builtins.isAttrs value && cond value
+          if isAttrs value && cond value
           then recurse next value
           else f next value
       );
@@ -118,7 +120,7 @@ in rec {
   # attribute set at that path
   attrValueAt = path: xs:
     foldl (left: right:
-      if builtins.isAttrs left && builtins.hasAttr right left
+      if isAttrs left && hasAttr right left
       then left.${right}
       else null)
     xs
@@ -137,11 +139,54 @@ in rec {
         binaryMerge start (start + (end - start) / 2) // binaryMerge (start + (end - start) / 2) end
       else
         # Otherwise there will be exactly 1 element due to the invariant, in which case we just return it directly
-        builtins.elemAt list start;
+        elemAt list start;
   in
     if list == []
     then
       # Calling binaryMerge as below would not satisfy its invariant
       {}
-    else binaryMerge 0 (builtins.length list);
+    else binaryMerge 0 (length list);
+
+  /**
+  Filter an attribute set by removing all attributes for which the
+  given predicate return false.
+
+  # Inputs
+
+  `pred`
+
+  : Predicate taking an attribute name and an attribute value, which returns `true` to include the attribute, or `false` to exclude the attribute.
+
+    <!-- TIP -->
+    If possible, decide on `name` first and on `value` only if necessary.
+    This avoids evaluating the value if the name is already enough, making it possible, potentially, to have the argument reference the return value.
+    (Depending on context, that could still be considered a self reference by users; a common pattern in Nix.)
+
+    <!-- TIP -->
+    `filterAttrs` is occasionally the cause of infinite recursion in configuration systems that allow self-references.
+    To support the widest range of user-provided logic, perform the `filterAttrs` call as late as possible.
+    Typically that's right before using it in a derivation, as opposed to an implicit conversion whose result is accessible to the user's expressions.
+
+  `set`
+
+  : The attribute set to filter
+
+  # Type
+
+  ```
+  filterAttrs :: (String -> Any -> Bool) -> AttrSet -> AttrSet
+  ```
+
+  # Examples
+  :::{.example}
+  ## `lib.attrsets.filterAttrs` usage example
+
+  ```nix
+  filterAttrs (n: v: n == "foo") { foo = 1; bar = 2; }
+  => { foo = 1; }
+  ```
+
+  :::
+  */
+  filterAttrs = pred: set: removeAttrs set (filter (name: !pred name set.${name}) (attrNames set));
 }
