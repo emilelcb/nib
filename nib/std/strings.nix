@@ -2,6 +2,7 @@
   inherit
     (builtins)
     isPath
+    replaceStrings
     substring
     stringLength
     ;
@@ -13,6 +14,7 @@
 in rec {
   # re-export builtin string methods
   inherit
+    replaceStrings
     substring
     stringLength
     ;
