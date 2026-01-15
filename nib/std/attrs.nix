@@ -1,5 +1,22 @@
 {nib, ...}: let
-  foldl = nib.std.foldl;
+  inherit
+    (builtins)
+    all
+    attrNames
+    elemAt
+    filter
+    hasAttr
+    isAttrs
+    length
+    listToAttrs
+    mapAttrs
+    ;
+
+  inherit
+    (nib.std)
+    foldl
+    ;
+
   inherit
     (nib.types)
     nullableToMaybe
