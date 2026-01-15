@@ -68,6 +68,7 @@ in rec {
       });
 
   # Alternative to mapAttrsRecursiveCond
+  # Allows mapping directly from a child path
   recmapCondFrom = path: cond: f: T: let
     delegate = path': recmapCondFrom path' cond f;
   in
@@ -83,26 +84,28 @@ in rec {
   # NOTE: refuses to go beyond Terminal types
   recmap = recmapCond (_: leaf: !(isTerminal leaf));
 
-  mergeStructsCond = cond: f: base: ext:
+  overrideStructCond = cond: f: S: ext:
     recmapCond
     cond
     (path: leaf:
       attrValueAt path ext
       |> unwrapSome (_: f leaf))
-    base;
+    S;
 
-  # mergeStruct ensures no properties are evaluated (entirely lazy)
-  # TODO: should this be called "overlayStructs" or something? (its not exactly a merge...)
+  # overrideStruct ensures no properties are evaluated (entirely lazy)
+  # TODO: should this be called "overlayStructs" or something? (its not exactly a override...)
   # NOTE: respects Terminal types
-  mergeStructs =
-    mergeStructsCond
+  overrideStructs =
+    overrideStructCond
     (_: leaf: !(isTerminal leaf))
     (leaf:
       if isTerminal leaf
       then unwrapTerminal leaf
       else leaf);
 
-  # # mergeTypedPartialStruct must evaluate properties (not lazy)
-  # # for lazy evaluation use mergeStruct instead!
-  # mergeTypedPartialStruct = mergeStructs' cmpTypedPartialStruct;
+  # # overrideTypedPartialStruct must evaluate properties (not lazy)
+  # # for lazy evaluation use overrideStruct instead!
+  # overrideTypedPartialStruct = overrideStructs' cmpTypedPartialStruct;
+
+  overrideAttrs = A: B: A // B;
 }
