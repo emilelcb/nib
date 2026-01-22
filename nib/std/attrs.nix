@@ -31,7 +31,7 @@ in rec {
 
   hasAttrs = list: xs: all (x: hasAttr x xs) list;
 
-  getAttrOr = name: xs: default:
+  getAttrOr = default: name: xs:
     if hasAttr name xs
     then getAttr name xs
     else default;
